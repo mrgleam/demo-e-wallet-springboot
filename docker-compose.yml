@@ -1,0 +1,13 @@
+services:
+  db:
+    image: public.ecr.aws/docker/library/postgres:16-bullseye
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=wallet
+
+volumes:
+  postgres-data:
