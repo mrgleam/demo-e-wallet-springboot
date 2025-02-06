@@ -14,6 +14,7 @@
     <packaging>pom</packaging>
 	<modules>
 		<module>user</module>
+		<module>transaction</module>
 	</modules>
     <name>wallet</name>
 	<description>Demo e-wallet project for Spring Boot</description>
