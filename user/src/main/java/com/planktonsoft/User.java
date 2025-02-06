@@ -35,6 +35,10 @@ public class User implements Serializable, UserDetails {
 
     private String password;
 
+    private String country;
+
+    private String dob;
+
     private String authorities;
 
     @Column(unique = true)
