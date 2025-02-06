@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
+    private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
@@ -20,16 +22,15 @@ public class UserService implements UserDetailsService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+    public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
+        return userRepository.findByPhoneNumber(phoneNumber);
     }
 
     public void create(UserCreateRequest userCreateRequest) throws JsonProcessingException {
         User user = userCreateRequest.to();
         user.setPassword(encryptPwd(user.getPassword()));
         user.setAuthorities(UserConstant.USER_AUTHORITY);
-
-        // TODO: Save user to database
+        userRepository.save(user);
 
         // TODO: Publish the event post user creation which can be listened by consumers
 
