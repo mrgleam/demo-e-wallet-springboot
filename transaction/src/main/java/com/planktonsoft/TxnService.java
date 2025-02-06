@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.ParseException;
 import java.util.UUID;
 
 @Service
@@ -42,5 +44,20 @@ public class TxnService {
         kafkaTemplate.send(TransactionConstant.TRANSACTION_CREATION_TOPIC, objectMapper.writeValueAsString(transaction));
 
         return transaction.getTransactionId();
+    }
+
+    @KafkaListener(topics = PocketConstant.POCKET_UPDATED_TOPIC, groupId = "grp123")
+    public void updateTxn(String msg) throws ParseException, JsonProcessingException {
+        TransactionMsg transactionMsg = objectMapper.readValue(msg, TransactionMsg.class);
+        String txnId = transactionMsg.getTransactionId();
+        logger.info("Updating txn: sender - {}, receiver - {}, amount - {}, txnId - {}", transactionMsg.getSender(), transactionMsg.getReceiver(), transactionMsg.getAmount(), transactionMsg.getTransactionId());
+
+        PocketUpdateStatus pocketUpdateStatus = transactionMsg.getPocketUpdateStatus();
+
+        if (pocketUpdateStatus == PocketUpdateStatus.SUCCESS) {
+            transactionRepository.updateTxn(txnId, TransactionStatus.SUCCESSFUL);
+        } else {
+            transactionRepository.updateTxn(txnId, TransactionStatus.FAILED);
+        }
     }
 }

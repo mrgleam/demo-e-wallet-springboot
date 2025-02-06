@@ -24,7 +24,7 @@ public class PocketService {
 
     @KafkaListener(topics = TransactionConstant.TRANSACTION_CREATION_TOPIC, groupId = "grp123")
     public void updateWalletsForTxn(String msg) throws ParseException, JsonProcessingException {
-        Transaction transaction = objectMapper.readValue(msg, Transaction.class);
+        TransactionMsg transaction = objectMapper.readValue(msg, TransactionMsg.class);
 
         logger.info("Updating wallets: sender - {}, receiver - {}, amount - {}, txnId - {}", transaction.getSender(), transaction.getReceiver(), transaction.getAmount(), transaction.getTransactionId());
 
@@ -41,7 +41,7 @@ public class PocketService {
         pocketRepository.updatePocket(transaction.getReceiver(), transaction.getAmount()); // +10
         pocketRepository.updatePocket(transaction.getSender(), 0 - transaction.getAmount());  // -10
 
-//        jsonObject.put("walletUpdateStatus", WalletUpdateStatus.SUCCESS);
-//        kafkaTemplate.send(CommonConstants.WALLET_UPDATED_TOPIC, objectMapper.writeValueAsString(jsonObject));
+        transaction.setPocketUpdateStatus(PocketUpdateStatus.SUCCESS);
+        kafkaTemplate.send(PocketConstant.POCKET_UPDATED_TOPIC, objectMapper.writeValueAsString(transaction));
     }
 }

@@ -1,11 +1,15 @@
 package com.planktonsoft;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Transaction {
+public class TransactionMsg {
     private String transactionId;
 
     private String sender;
@@ -15,4 +19,7 @@ public class Transaction {
     private String purpose;
 
     private Double amount;
+
+    @Enumerated(value = EnumType.STRING)
+    private PocketUpdateStatus pocketUpdateStatus;
 }
