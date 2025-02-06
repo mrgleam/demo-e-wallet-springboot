@@ -39,8 +39,7 @@ public class TxnService {
 
         transactionRepository.save(transaction);
 
-        String TRANSACTION_CREATION_TOPIC = "transaction_create";
-        kafkaTemplate.send(TRANSACTION_CREATION_TOPIC, objectMapper.writeValueAsString(transaction));
+        kafkaTemplate.send(TransactionConstant.TRANSACTION_CREATION_TOPIC, objectMapper.writeValueAsString(transaction));
 
         return transaction.getTransactionId();
     }

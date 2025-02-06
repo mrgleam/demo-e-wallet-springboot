@@ -15,6 +15,8 @@
 	<modules>
 		<module>user</module>
 		<module>transaction</module>
+		<module>pocket</module>
+		<module>utils</module>
 	</modules>
     <name>wallet</name>
 	<description>Demo e-wallet project for Spring Boot</description>
