@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserConfig {
 
     @Bean
-    PasswordEncoder getPE() {
+    public static PasswordEncoder getPE() {
         return new BCryptPasswordEncoder();
     }
 
