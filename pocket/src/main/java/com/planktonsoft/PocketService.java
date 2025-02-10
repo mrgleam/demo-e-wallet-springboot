@@ -9,8 +9,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-
 @Service
 @RequiredArgsConstructor
 public class PocketService {
@@ -22,8 +20,23 @@ public class PocketService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    @KafkaListener(topics = UserConstant.USER_CREATION_TOPIC, groupId = "grp123")
+    public void createWallet(String msg) throws JsonProcessingException {
+        UserMsg user = objectMapper.readValue(msg, UserMsg.class);
+
+        Pocket pocket = Pocket.builder()
+                .userId(user.getUserId())
+                .phoneNumber(user.getPhoneNumber())
+                .userIdentifier(user.getUserIdentifier())
+                .identifierValue(user.getIdentifierValue())
+                .balance(0.0)
+                .build();
+
+        pocketRepository.save(pocket);
+    }
+
     @KafkaListener(topics = TransactionConstant.TRANSACTION_CREATION_TOPIC, groupId = "grp123")
-    public void updateWalletsForTxn(String msg) throws ParseException, JsonProcessingException {
+    public void updateWalletsForTxn(String msg) throws JsonProcessingException {
         TransactionMsg transaction = objectMapper.readValue(msg, TransactionMsg.class);
 
         logger.info("Updating wallets: sender - {}, receiver - {}, amount - {}, txnId - {}", transaction.getSender(), transaction.getReceiver(), transaction.getAmount(), transaction.getTransactionId());
