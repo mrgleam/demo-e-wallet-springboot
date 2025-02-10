@@ -64,6 +64,15 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public String getUsername() {
-        return this.phoneNumber;
+        return phoneNumber;
+    }
+
+    public UserMsg to(){
+        return UserMsg.builder()
+                .userId((long) id)
+                .phoneNumber(phoneNumber)
+                .userIdentifier(userIdentifier)
+                .identifierValue(identifierValue)
+                .build();
     }
 }

@@ -30,10 +30,10 @@ public class UserService implements UserDetailsService {
         User user = userCreateRequest.to();
         user.setPassword(encryptPwd(user.getPassword()));
         user.setAuthorities(UserConstant.USER_AUTHORITY);
-        userRepository.save(user);
+        User saved = userRepository.save(user);
 
         kafkaTemplate.send(UserConstant.USER_CREATION_TOPIC,
-                objectMapper.writeValueAsString(userCreateRequest));
+                objectMapper.writeValueAsString(saved.to()));
     }
 
     private String encryptPwd(String rawPwd){

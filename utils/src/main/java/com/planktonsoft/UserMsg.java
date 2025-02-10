@@ -5,6 +5,7 @@ import lombok.*;
 
 @Getter
 @Setter
+@Builder
 public class UserMsg {
     private Long userId;
 
