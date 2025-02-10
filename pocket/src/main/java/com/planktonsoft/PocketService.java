@@ -33,8 +33,8 @@ public class PocketService {
 
         if (senderWallet == null || receiverWallet == null
                 || senderWallet.getBalance() < transaction.getAmount()) {
-//            jsonObject.put("walletUpdateStatus", WalletUpdateStatus.FAILED);
-//            kafkaTemplate.send(CommonConstants.WALLET_UPDATED_TOPIC, objectMapper.writeValueAsString(jsonObject));
+            transaction.setPocketUpdateStatus(PocketUpdateStatus.FAILED);
+            kafkaTemplate.send(PocketConstant.POCKET_UPDATED_TOPIC, objectMapper.writeValueAsString(transaction));
             return;
         }
 
