@@ -32,10 +32,7 @@ public class UserService implements UserDetailsService {
         user.setAuthorities(UserConstant.USER_AUTHORITY);
         userRepository.save(user);
 
-        // TODO: Publish the event post user creation which can be listened by consumers
-
-        String USER_CREATION_TOPIC = "user_create";
-        kafkaTemplate.send(USER_CREATION_TOPIC,
+        kafkaTemplate.send(UserConstant.USER_CREATION_TOPIC,
                 objectMapper.writeValueAsString(userCreateRequest));
     }
 
