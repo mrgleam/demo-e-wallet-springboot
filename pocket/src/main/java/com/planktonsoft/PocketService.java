@@ -20,7 +20,7 @@ public class PocketService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    @KafkaListener(topics = UserConstant.USER_CREATION_TOPIC, groupId = "grp123")
+    @KafkaListener(topics = UserConstant.USER_CREATION_TOPIC, groupId = "user-grp")
     public void createWallet(String msg) throws JsonProcessingException {
         UserMsg user = objectMapper.readValue(msg, UserMsg.class);
 
@@ -35,7 +35,7 @@ public class PocketService {
         pocketRepository.save(pocket);
     }
 
-    @KafkaListener(topics = TransactionConstant.TRANSACTION_CREATION_TOPIC, groupId = "grp123")
+    @KafkaListener(topics = TransactionConstant.TRANSACTION_CREATION_TOPIC, groupId = "transaction-grp")
     public void updateWalletsForTxn(String msg) throws JsonProcessingException {
         TransactionMsg transaction = objectMapper.readValue(msg, TransactionMsg.class);
 

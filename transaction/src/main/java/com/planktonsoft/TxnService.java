@@ -46,7 +46,7 @@ public class TxnService {
         return transaction.getTransactionId();
     }
 
-    @KafkaListener(topics = PocketConstant.POCKET_UPDATED_TOPIC, groupId = "grp123")
+    @KafkaListener(topics = PocketConstant.POCKET_UPDATED_TOPIC, groupId = "pocket-grp")
     public void updateTxn(String msg) throws ParseException, JsonProcessingException {
         TransactionMsg transactionMsg = objectMapper.readValue(msg, TransactionMsg.class);
         String txnId = transactionMsg.getTransactionId();
