@@ -23,7 +23,7 @@ public class UserSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/users/**").permitAll() // Public for signup
+                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll() // Public for signup
                         .requestMatchers("/users/**").hasAuthority(UserConstant.USER_AUTHORITY) // Restricted to users
                         .requestMatchers("/**").hasAnyAuthority(UserConstant.ADMIN_AUTHORITY, UserConstant.SERVICE_AUTHORITY) // Restricted to admin/system
                         .anyRequest().authenticated() // All other requests require authentication

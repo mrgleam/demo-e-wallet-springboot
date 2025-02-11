@@ -21,6 +21,8 @@ public class UserService implements UserDetailsService {
 
     private final ObjectMapper objectMapper;
 
+    private final JwtGenerator jwtGenerator;
+
     @Override
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
         return userRepository.findByPhoneNumber(phoneNumber);
@@ -35,6 +37,15 @@ public class UserService implements UserDetailsService {
         kafkaTemplate.send(UserConstant.USER_CREATION_TOPIC,
                 objectMapper.writeValueAsString(saved.to()));
     }
+
+    public boolean verifyPwd(String rawPwd, String encodedPwd) {
+        return passwordEncoder.matches(rawPwd, encodedPwd);
+    }
+
+    public String generateToken(String phoneNumber) {
+        return jwtGenerator.generateUserToken(phoneNumber);
+    }
+
 
     private String encryptPwd(String rawPwd){
         return passwordEncoder.encode(rawPwd);

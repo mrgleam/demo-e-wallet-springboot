@@ -1,0 +1,35 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: authentication-service
+    url: http://user-service:8000
+    routes:
+      - name: authentication-route
+        paths:
+          - /api/v1
+  - name: transaction-service
+    url: http://transaction-service:8000
+    routes:
+      - name: transaction-route
+        paths:
+          - /transactions/api/v1
+    plugins:
+      - name: jwt
+        config:
+          claims_to_verify:
+            - exp
+      - name: custom-jwt-claims-headers
+        config:
+          uri_param_names:
+            - jwt
+          claims_to_include:
+            - sub
+            - role
+          continue_on_error: false
+consumers:
+  - username: authentication-user
+    jwt_secrets:
+      - key: unclequin.me
+        algorithm: HS256
+        secret: YourSuperStrongSecretKeyHere123!

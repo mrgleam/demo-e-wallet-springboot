@@ -21,6 +21,7 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
   db:
     image: public.ecr.aws/docker/library/postgres:16-bullseye
     restart: unless-stopped
@@ -31,7 +32,55 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=wallet
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user/Dockerfile
+    depends_on:
+      - db
+    environment:
+      SERVER_PORT: 8000
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/userdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
+  transaction-service:
+    build:
+      context: .
+      dockerfile: transaction/Dockerfile
+    depends_on:
+      - db
+      - broker
+    environment:
+      SERVER_PORT: 8000
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/txndb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      KAFKA_BOOTSTRAP_SERVERS: broker:29092
+
+  pocket-service:
+    build:
+      context: .
+      dockerfile: pocket/Dockerfile
+    depends_on:
+      - db
+      - broker
+    environment:
+      SERVER_PORT: 8000
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pocketdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      KAFKA_BOOTSTRAP_SERVERS: broker:29092
+
+  gateway:
+    image: demo/gateway
+    build: ./gateway
+    environment:
+      - KONG_ADMIN_LISTEN=0.0.0.0:8081
+      - KONG_PROXY_LISTEN=0.0.0.0:8080
+      - KONG_DATABASE=off
+      - KONG_PLUGINS=bundled,custom-jwt-claims-headers
 
 volumes:
   postgres-data:
