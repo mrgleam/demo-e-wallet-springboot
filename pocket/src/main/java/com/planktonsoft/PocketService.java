@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,25 +37,36 @@ public class PocketService {
     }
 
     @KafkaListener(topics = TransactionConstant.TRANSACTION_CREATION_TOPIC, groupId = "transaction-grp")
+    @Transactional
     public void updateWalletsForTxn(String msg) throws JsonProcessingException {
         TransactionMsg transaction = objectMapper.readValue(msg, TransactionMsg.class);
 
         logger.info("Updating wallets: sender - {}, receiver - {}, amount - {}, txnId - {}", transaction.getSender(), transaction.getReceiver(), transaction.getAmount(), transaction.getTransactionId());
 
-        Pocket senderWallet = pocketRepository.findByPhoneNumber(transaction.getSender());
-        Pocket receiverWallet = pocketRepository.findByPhoneNumber(transaction.getReceiver());
+        try {
+            Pocket senderWallet = pocketRepository.findByPhoneNumber(transaction.getSender());
+            Pocket receiverWallet = pocketRepository.findByPhoneNumber(transaction.getReceiver());
 
-        if (senderWallet == null || receiverWallet == null
-                || senderWallet.getBalance() < transaction.getAmount()) {
-            transaction.setPocketUpdateStatus(PocketUpdateStatus.FAILED);
+            if (senderWallet == null || receiverWallet == null
+                    || senderWallet.getBalance() < transaction.getAmount()) {
+                handleFailure(transaction);
+                return;
+            }
+
+            pocketRepository.updatePocket(transaction.getReceiver(), transaction.getAmount()); // +10
+            pocketRepository.updatePocket(transaction.getSender(), 0 - transaction.getAmount());  // -10
+
+            transaction.setPocketUpdateStatus(PocketUpdateStatus.SUCCESS);
             kafkaTemplate.send(PocketConstant.POCKET_UPDATED_TOPIC, objectMapper.writeValueAsString(transaction));
-            return;
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred: {}", e.getMessage());
+            handleFailure(transaction);
         }
+    }
 
-        pocketRepository.updatePocket(transaction.getReceiver(), transaction.getAmount()); // +10
-        pocketRepository.updatePocket(transaction.getSender(), 0 - transaction.getAmount());  // -10
-
-        transaction.setPocketUpdateStatus(PocketUpdateStatus.SUCCESS);
+    private void handleFailure(TransactionMsg transaction) throws JsonProcessingException {
+        transaction.setPocketUpdateStatus(PocketUpdateStatus.FAILED);
         kafkaTemplate.send(PocketConstant.POCKET_UPDATED_TOPIC, objectMapper.writeValueAsString(transaction));
     }
+
 }
