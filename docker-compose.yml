@@ -44,6 +44,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/userdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
+      KAFKA_BOOTSTRAP_SERVERS: broker:29092
 
   transaction-service:
     build:
