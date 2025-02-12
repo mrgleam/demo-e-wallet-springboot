@@ -23,7 +23,7 @@ public class PocketServiceTest {
     }
 
     @Test
-    void whenCreateWallet_thenControlFlowAsExpected() throws Exception {
+    void whenCreateWallet_thenControlFlowAsExpected() {
         String testMsg = "{\"userId\": \"100\", \"phoneNumber\": \"+1234567890\", \"userIdentifier\": \"NATIONAL_ID\", \"identifierValue\": \"some-unique-id-123\"}";
         when(objectMapper.tryReadValue(testMsg, UserMsg.class)).thenCallRealMethod();
         when(pocketRepository.save(any(Pocket.class)))
