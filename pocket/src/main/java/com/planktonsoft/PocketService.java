@@ -24,9 +24,9 @@ public class PocketService {
     public void createWallet(String user) {
         objectMapper.tryReadValue(user, UserMsg.class)
                 .map(Pocket::from)
-                .map(pocketRepository::save).onFailure(e -> {
-                    logger.error("Creating wallets: {}", e.getMessage());
-                 });
+                .map(pocketRepository::save).onFailure(e ->
+                    logger.error("Creating wallets: {}", e.getMessage())
+                 );
     }
 
     @KafkaListener(topics = TransactionConstant.TRANSACTION_CREATION_TOPIC, groupId = "transaction-grp")
