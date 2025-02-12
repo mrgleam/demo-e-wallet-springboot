@@ -34,12 +34,14 @@ public class UserCreateRequest {
 
     public User to(){
         return User.builder()
-                .name(this.name)
-                .phoneNumber(this.phoneNumber)
-                .password(this.password)
-                .email(this.email)
-                .userIdentifier(this.userIdentifier)
-                .identifierValue(this.identifierValue)
+                .name(name)
+                .phoneNumber(phoneNumber)
+                .password(password)
+                .email(email)
+                .country(country)
+                .dob(dob)
+                .userIdentifier(userIdentifier)
+                .identifierValue(identifierValue)
                 .build();
     }
 
