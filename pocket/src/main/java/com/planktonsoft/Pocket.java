@@ -25,4 +25,14 @@ public class Pocket {
 
     @Enumerated(value = EnumType.STRING)
     private UserIdentifier userIdentifier;
+
+    public static Pocket from(UserMsg user){
+        return Pocket.builder()
+                .userId(user.getUserId())
+                .phoneNumber(user.getPhoneNumber())
+                .userIdentifier(user.getUserIdentifier())
+                .identifierValue(user.getIdentifierValue())
+                .balance(0.0)
+                .build();
+    }
 }

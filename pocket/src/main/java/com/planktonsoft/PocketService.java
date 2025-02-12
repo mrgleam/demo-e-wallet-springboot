@@ -1,7 +1,6 @@
 package com.planktonsoft;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,23 +16,17 @@ public class PocketService {
 
     private final PocketRepository pocketRepository;
 
-    private final ObjectMapper objectMapper;
+    private final TryObjectMapper objectMapper;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @KafkaListener(topics = UserConstant.USER_CREATION_TOPIC, groupId = "user-grp")
-    public void createWallet(String msg) throws JsonProcessingException {
-        UserMsg user = objectMapper.readValue(msg, UserMsg.class);
-
-        Pocket pocket = Pocket.builder()
-                .userId(user.getUserId())
-                .phoneNumber(user.getPhoneNumber())
-                .userIdentifier(user.getUserIdentifier())
-                .identifierValue(user.getIdentifierValue())
-                .balance(0.0)
-                .build();
-
-        pocketRepository.save(pocket);
+    public void createWallet(String user) {
+        objectMapper.tryReadValue(user, UserMsg.class)
+                .map(Pocket::from)
+                .map(pocketRepository::save).onFailure(e -> {
+                    logger.error("Creating wallets: {}", e.getMessage());
+                 });
     }
 
     @KafkaListener(topics = TransactionConstant.TRANSACTION_CREATION_TOPIC, groupId = "transaction-grp")

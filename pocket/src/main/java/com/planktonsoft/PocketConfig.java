@@ -19,8 +19,8 @@ public class PocketConfig {
     private String bootstrapServers;
 
     @Bean
-    ObjectMapper getObjectMapper(){
-        return new ObjectMapper();
+    TryObjectMapper getTryObjectMapper(){
+        return new TryObjectMapper();
     }
 
     Properties getCProperties(){

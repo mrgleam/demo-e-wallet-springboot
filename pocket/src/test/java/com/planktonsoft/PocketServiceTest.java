@@ -1,6 +1,5 @@
 package com.planktonsoft;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -13,7 +12,7 @@ public class PocketServiceTest {
     private PocketRepository pocketRepository;
 
     @Spy
-    private ObjectMapper objectMapper;
+    private TryObjectMapper objectMapper;
 
     @InjectMocks
     private PocketService pocketService;
@@ -26,7 +25,7 @@ public class PocketServiceTest {
     @Test
     void whenCreateWallet_thenControlFlowAsExpected() throws Exception {
         String testMsg = "{\"userId\": \"100\", \"phoneNumber\": \"+1234567890\", \"userIdentifier\": \"NATIONAL_ID\", \"identifierValue\": \"some-unique-id-123\"}";
-        when(objectMapper.readValue(testMsg, UserMsg.class)).thenCallRealMethod();
+        when(objectMapper.tryReadValue(testMsg, UserMsg.class)).thenCallRealMethod();
         when(pocketRepository.save(any(Pocket.class)))
                 .thenReturn(new Pocket());
 
