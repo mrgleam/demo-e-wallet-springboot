@@ -12,7 +12,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/users")
+    @PostMapping("/signup")
     public void createUser(@RequestBody UserCreateRequest userCreateRequest) throws JsonProcessingException {
         userService.create(userCreateRequest);
     }
