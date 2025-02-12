@@ -25,7 +25,7 @@ public class PocketService {
         objectMapper.tryReadValue(user, UserMsg.class)
                 .map(Pocket::from)
                 .map(pocketRepository::save).onFailure(e ->
-                    logger.error("Creating wallets: {}", e.getMessage())
+                    logger.error("Creating pockets: {}", e.getMessage())
                  );
     }
 
