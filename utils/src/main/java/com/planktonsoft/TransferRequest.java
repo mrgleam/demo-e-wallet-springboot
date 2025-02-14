@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TransactionMsg {
+public class TransferRequest {
     private String transactionId;
 
     private String sender;
